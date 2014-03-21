@@ -1,39 +1,73 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
+    <head>
+        <meta charset="utf-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
-		<title> Real time multi-player games with HTML5</title>
-
-			<!-- Load style sheet -->
-		<link href="index.css" media="screen" rel="stylesheet" type="text/css">
-
-	<!-- Library code -->
+        <title>Hello World</title>
+    </head>
+    <body>
+        <div id="log">waiting...</div>
+		<div id="isiChat">
 		
-		 	<!-- Load socket.io client side contents. -->
-		<script src="/socket.io/socket.io.js"></script>
-
-
-	 		<!-- Load the GUI rendering library code. -->
-		<script type="text/javascript" src="lib/dat.gui.min.js"></script>
-			<!-- Load the keyboard specific code --> 
-		<script type="text/javascript" src="lib/keyboard.js"></script>
-	 	
-	<!-- Game code -->
-
-	 		<!-- Load the common game code. -->
-		<script type="text/javascript" src="game.core.js"></script>
-			<!-- Finally, Load the game client code. -->
-		<script type="text/javascript" src="client.js"></script>		
-
-	</head>
-
-	<body>
+		</div>
+		<input type='text' id='textChat'/>
+		<input type='submit'  onClick='kirim()'/>
         <script type="text/javascript" src="cordova.js"></script>
-		<canvas id="viewport">
-		</canvas>
-	</body>
+        <script>
+				
+          function loadScript(url, callback) {
+            var head = document.getElementsByTagName('head')[0];
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = url;
+            script.onload = callback;
+            head.appendChild(script);
+          }
+          function init() {
+			
+            loadScript('js/socket.io.js', function () {
 
+              var socket = io.connect("http://nodejs-chatku.rhcloud.com/");
+			
+			
+              document.getElementById('log').innerHTML = "connecting";
+
+              socket.on('ping', function (data) {		
+				function kirim(){
+					socket.emit('pong', { message: document.getElementById("textChat").value });
+				}
+				document.getElementById('log').innerHTML = data.message;
+              });
+
+              socket.on('connect', function () {
+                 document.getElementById('log').innerHTML = "connected";
+              });
+
+              socket.on('reconnect', function () {
+                document.getElementById('log').innerHTML = "reconnected";
+              });
+
+              socket.on('disconnect', function () {
+                document.getElementById('log').innerHTML = "disconnected";
+              });
+
+              socket.on('reconnecting', function () {
+                document.getElementById('log').innerHTML = "reconnecting...";
+              });
+
+              socket.on('error', function () {
+                document.getElementById('log').innerHTML = "error";
+              });
+			  
+            });
+          }
+		  
+		
+			init();
+          document.addEventListener("deviceready", init, false);
+
+        </script>
+    </body>
 </html>
